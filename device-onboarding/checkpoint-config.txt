@@ -1,0 +1,34 @@
+# Check Point Security Gateway Configuration Export
+# Device: HV-DC-FRANKFURT-GW01
+# Version: R81.20
+# Export date: 2025-01-15
+[GATEWAY]
+hostname = HV-DC-FRANKFURT-GW01
+version = R81.20
+management_server = HV-SMS-FRANKFURT
+policy_package = HV_DataCentre_Policy
+last_policy_install = 2025-01-10 09:23:00
+[INTERFACES]
+eth0 name=external ip=84.200.50.1 mask=255.255.255.0 topology=external
+eth1 name=dc-internal ip=10.50.1.1 mask=255.255.0.0 topology=internal
+eth2 name=dc-dmz ip=172.16.50.1 mask=255.255.255.0 topology=dmz
+eth3 name=mgmt ip=192.168.1.1 mask=255.255.255.0 topology=internal
+[FIREWALL_RULES]
+rule_id=1 name="allow-office-to-dc" src=10.10.0.0/8 dst=10.50.0.0/16 service=HTTPS,SSH action=accept track=log
+rule_id=2 name="allow-dc-services-outbound" src=10.50.0.0/16 dst=any service=HTTP,HTTPS,DNS action=accept track=log
+rule_id=3 name="allow-dc-to-dc-dmz" src=10.50.1.0/24 dst=172.16.50.0/24 service=HTTP,HTTPS,SSH action=accept track=log
+rule_id=4 name="deny-office-to-dc-dmz" src=10.10.0.0/8 dst=172.16.50.0/24 service=ANY action=drop track=log
+rule_id=5 name="allow-trading-dc-feeds" src=10.20.1.0/24 dst=10.50.2.0/24 service=FIX,HTTPS action=accept track=log
+rule_id=6 name="allow-compliance-reporting" src=10.20.2.0/24 dst=10.50.3.0/24 service=HTTPS,SFTP action=accept track=log
+rule_id=7 name="allow-mgmt-access" src=192.168.1.0/24 dst=any service=SSH,HTTPS action=accept track=log
+rule_id=8 name="deny-all-inbound" src=any dst=10.50.0.0/16 service=ANY action=drop track=log
+rule_id=9 name="implicit-cleanup" src=any dst=any service=ANY action=drop track=log
+[POLICY_LAYERS]
+layer_name=Network layer_type=ordered_standard
+layer_name=Application layer_type=inline
+[NAT_RULES]
+nat_id=1 original_src=10.50.0.0/16 translated_src=84.200.50.1 direction=outbound
+[ANTI_SPOOFING]
+eth0 valid_addresses=external only
+eth1 valid_addresses=10.50.0.0/16
+eth2 valid_addresses=172.16.50.0/24

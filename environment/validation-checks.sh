@@ -38,7 +38,13 @@ if docker info >/dev/null 2>&1; then
     echo "✔ Docker is running"
     ((PASSED++))
 else
-    echo "✗ Docker is not running"
+    echo "✗[FAIL] Docker validation failed.
+No running Docker containers detected.
+
+Action:
+Start Docker Desktop and verify required containers are running.
+
+Exiting with code 1."
 fi
 
 ###############################################################################
